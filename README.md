@@ -2,4 +2,4 @@ Artifact Author: ```Chidera Biringa```
 
 ---
 
-cstyleBERT: Tree Pre-Training for Vocabulary-Efficient Vulnerabilities Detection
+castBERT: Code-Tree Pre-Training for Vulnerabilities Detection

@@ -8,9 +8,6 @@ import pathlib
 import collections
 
 class VocabularyReduce:
-	def __init__(self) -> None:
-		pass
-
 	def _pickle_data(self, data, file_name):
 		with open(file_name, 'wb') as file:
 			pickle.dump(data, file)
@@ -64,6 +61,26 @@ class VocabularyReduce:
 				temp.append(feature.translate(str.maketrans("", "", string.punctuation)))
 			out.append(temp)
 		return out
+	
+	def astnodes_prunned(self, asts):
+		out = []
+		for ast in asts:
+			temp = []
+			for node in ast.split():
+				if node.startswith("`-") or node.startswith("|-"): 
+					temp.append(node[2:])
+			out.append(" ".join(temp))
+		return out
+	
+	def pretrain_astnodes_unprunned(self, asts):
+		unprunned_asts = []
+		for ast in asts:
+			temp = []
+			for line in ast.splitlines():
+				if "funcast" not in line:
+					temp.append(line)
+			unprunned_asts.append("".join(temp))
+		return unprunned_asts
 
 	def _cstyle_funcs(self, funcs, stmts, exprs, decls, types):
 		cstyle_funcs, cstyle = [], []
@@ -72,13 +89,13 @@ class VocabularyReduce:
 			cstyle.append(stmt + expr + decl + type)
 		return cstyle_funcs, cstyle
 	
-	def prep_finetune_data(x, y):
+	def prep_finetune_data(self, x, y):
 		X_train, Xs, y_train, ys = sklearn.model_selection.train_test_split(x, y, train_size = 0.8, random_state = 1)
 		X_val, X_test, y_val, y_test = sklearn.model_selection.train_test_split(Xs, ys, test_size = 0.5, random_state = 1)
 		train_df = pandas.DataFrame({"text": X_train, "labels": y_train})
 		train_df["text"] = train_df["text"].astype("string")
 		val_df = pandas.DataFrame({"text": X_val, "labels": y_val})
 		val_df["text"] = val_df["text"].astype("string")
-		test_df = pd.DataFrame({"text": X_test, "labels": y_test})
+		test_df = pandas.DataFrame({"text": X_test, "labels": y_test})
 		test_df["text"] = test_df["text"].astype("string")
 		return train_df, val_df, test_df

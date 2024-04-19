@@ -1,10 +1,8 @@
-import os, pathlib
+import os
+import pathlib
 import collections
 
 class Prepare:
-	def __init__(self) -> None:
-		pass
-
 	def get_tree(self, tree_dir):
 		out = {}
 		for root, _, files in os.walk(tree_dir):
@@ -26,6 +24,16 @@ class Prepare:
 				if node.startswith("`-") or node.startswith("|-"):
 					out.append(node[2:])
 		return out
+
+	def pretrain_astnodes_unprunned(self, asts):
+		unprunned_asts = []
+		for ast in asts:
+			temp = []
+			for line in ast.splitlines():
+				if "funcast" not in line:
+					temp.append(line)
+			unprunned_asts.append("".join(temp))
+		return unprunned_asts
 
 	def save_pretrain_data(self, filename, data):
 		with open(filename, 'w') as f:
