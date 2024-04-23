@@ -1,4 +1,5 @@
 import os
+import csv
 import pathlib
 import collections
 
@@ -35,7 +36,26 @@ class Prepare:
 			unprunned_asts.append("".join(temp))
 		return unprunned_asts
 
+	def read_ctext(self, fpath):
+		out = []
+		with open(fpath) as file:
+			lines = csv.reader(file, delimiter = "\t")
+			for line in lines:
+				out.append(line)
+		return out
+	
+	def pl(self, path):
+		out = []
+		for root, _, files in os.walk(path):
+			for file in files:
+				if file.endswith("pl.tsv"):
+					out.append(self.read_ctext(os.path.join(root, file)))
+		return [i[0] for data in out for i in data]
+
 	def save_pretrain_data(self, filename, data):
+		out = []
+		for obs in data:
+			out.append(obs.replace("\n", ""))
 		with open(filename, 'w') as f:
-			for line in data:
+			for line in out:
 				f.write(f"{line}\n")
