@@ -2,8 +2,17 @@ import os
 import csv
 import pathlib
 import collections
+import pandas as pd
 
 class Prepare:
+	def write_cf(self, location, data, idx = 1):
+		with open(os.path.join(location, f"{idx}.c"), "w") as cfile:
+			cfile.write(data)
+
+	def c_gen(self, location, data):
+		for idx, file in enumerate(data):
+			self.write_cf(location, file, idx + 1)
+
 	def get_tree(self, tree_dir):
 		out = {}
 		for root, _, files in os.walk(tree_dir):
@@ -25,6 +34,12 @@ class Prepare:
 				if node.startswith("`-") or node.startswith("|-"):
 					out.append(node[2:])
 		return out
+	
+	def rm_nl(self, data):
+		out = []
+		for obs in data:
+			out.append(obs.replace("\n", ""))
+		return out
 
 	def pretrain_astnodes_unprunned(self, asts):
 		unprunned_asts = []
@@ -43,14 +58,25 @@ class Prepare:
 			for line in lines:
 				out.append(line)
 		return out
-	
-	def pl(self, path):
+
+	def process_ctext(self, path):
 		out = []
 		for root, _, files in os.walk(path):
 			for file in files:
 				if file.endswith("pl.tsv"):
 					out.append(self.read_ctext(os.path.join(root, file)))
 		return [i[0] for data in out for i in data]
+
+	def process_csnet(self, fpath, vb_cotext):
+		res = []
+		for root, _, files in os.walk(fpath):
+			for file in files:
+				if file.endswith(".jsonl"):
+					source_file_pth = os.path.join(root, file)
+					df = pd.read_json(source_file_pth, lines = True)
+					res.append(df["code"])
+		csnet_pretrain = [i for data in res for i in data]
+		return self.rm_nl(vb_cotext + csnet_pretrain)
 
 	def save_pretrain_data(self, filename, data):
 		out = []
