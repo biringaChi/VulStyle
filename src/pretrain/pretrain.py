@@ -1,20 +1,40 @@
+import os
+import time
+import errno 
 import torch
+import random
+import numpy as np
 from simpletransformers.language_modeling import LanguageModelingModel, LanguageModelingArgs
 
-class Pretrain:
-	def pretrain(self):
-		torch.manual_seed(60)
-		train_file = None # train file
-		model_args = LanguageModelingArgs(output_dir = "models/castBERT",
-									overwrite_output_dir = True,
-									max_seq_length = 512,
-									train_batch_size = 8, 
-									num_train_epochs = 2)
-		model_args.config = {"num_hidden_layers": 12, 
-					   "num_attention_heads" : 12, 
-					   "max_position_embeddings" : 1026,
-					   "vocab_size" : 100000,
-					   "type_vocab_size" : 1
-					   } 
-		model = LanguageModelingModel("roberta", None, args = model_args, train_files = train_file, use_cuda = True, cuda_device = 1)
-		model.train_model(train_file)
+def reproducibility(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    os.environ["PYHTONHASHSEED"] = str(seed)
+
+reproducibility(4)
+
+train_file = "pretraining_data.txt"
+
+model_args = LanguageModelingArgs(output_dir = "models/cstyleBERT", 
+                                  overwrite_output_dir = True,
+                                  vocab_size = 50000, 
+                                  train_batch_size = 32, 
+                                  num_train_epochs = 3
+                                  )
+start_time = time.time()
+try:
+    model = LanguageModelingModel("roberta", 
+                                  None, 
+                                  args = model_args, 
+                                  train_files = train_file, 
+                                  use_cuda = True, 
+                                  cuda_device = 0
+                                  )
+    model.train_model(train_file)
+except IOError as err: 
+    if err.errno == errno.EPIPE: 
+      pass
+
+print(f"Pre-training time: {time.time() - start_time} sec")

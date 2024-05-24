@@ -34,7 +34,8 @@ class VocabularyReduce:
 					source_file_pth = os.path.join(root, file)
 					try:
 						source_file_name = int(pathlib.Path(source_file_pth).stem.split(".")[0])
-					except ValueError: pass
+					except ValueError: 
+						pass
 					try:
 						with open(source_file_pth, "r") as source_file:
 							out[source_file_name] = source_file.read()
@@ -64,7 +65,7 @@ class VocabularyReduce:
 			out.append(temp)
 		return out
 	
-	def astnodes_prunned(self, asts):
+	def nonterminal_nodes(self, asts):
 		out = []
 		for ast in asts:
 			temp = []

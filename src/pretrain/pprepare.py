@@ -1,17 +1,15 @@
 import os
 import csv
+import json
 import pathlib
 import collections
 import pandas as pd
 
 class Prepare:
-	def write_cf(self, location, data, idx = 1):
-		with open(os.path.join(location, f"{idx}.c"), "w") as cfile:
-			cfile.write(data)
-
-	def c_gen(self, location, data):
+	def c_gen(self, data, location):
 		for idx, file in enumerate(data):
-			self.write_cf(location, file, idx + 1)
+			with open(os.path.join(location, f"{idx + 1}.c"), "w") as cfile:
+				cfile.write(file)
 
 	def get_tree(self, tree_dir):
 		out = {}
@@ -67,7 +65,7 @@ class Prepare:
 					out.append(self.read_ctext(os.path.join(root, file)))
 		return [i[0] for data in out for i in data]
 
-	def process_csnet(self, fpath, vb_cotext):
+	def process_codesearchnet(self, fpath):
 		res = []
 		for root, _, files in os.walk(fpath):
 			for file in files:
@@ -76,12 +74,32 @@ class Prepare:
 					df = pd.read_json(source_file_pth, lines = True)
 					res.append(df["code"])
 		csnet_pretrain = [i for data in res for i in data]
-		return self.rm_nl(vb_cotext + csnet_pretrain)
+		return csnet_pretrain
+
+	def diversevul_pretrain(self, file_path):
+		diversevul = []
+		with open(file_path, "r") as file:
+			for line in file:
+				diversevul.append(json.loads(line))
+		return pd.DataFrame.from_dict(diversevul)
+
+	def bigvul_pretrain(self, train_path, val_path, test_path):
+		bigvul_train = pd.read_parquet(train_path, engine = "pyarrow")
+		bigvul_validation = pd.read_parquet(val_path, engine = "pyarrow")
+		bigvul_test = pd.read_parquet(test_path, engine = "pyarrow")
+		return bigvul_train, bigvul_validation, bigvul_test
+
+	def multimodal_pretrain(self, funcs, nonterminal_nodes):
+		out = []
+		for func, ntn in zip(funcs, nonterminal_nodes):
+			out.append(func + ntn)
+		return out
 
 	def save_pretrain_data(self, filename, data):
-		out = []
-		for obs in data:
-			out.append(obs.replace("\n", ""))
-		with open(filename, 'w') as f:
-			for line in out:
-				f.write(f"{line}\n")
+		with open(filename, "w") as f:
+			for line in data:
+				f.write(f"{repr(line)}\n")
+	
+	def reader(self, file_path):
+		with open(file_path, "r") as f: 
+			return f.readlines()
