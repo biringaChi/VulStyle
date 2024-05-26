@@ -89,10 +89,10 @@ class Prepare:
 		bigvul_test = pd.read_parquet(test_path, engine = "pyarrow")
 		return bigvul_train, bigvul_validation, bigvul_test
 
-	def multimodal_pretrain(self, funcs, nonterminal_nodes):
+	def multimodal(self, funcs, nodes):
 		out = []
-		for func, ntn in zip(funcs, nonterminal_nodes):
-			out.append(func + ntn)
+		for func, node in zip(funcs, nodes):
+			out.append(func + node)
 		return out
 
 	def save_pretrain_data(self, filename, data):

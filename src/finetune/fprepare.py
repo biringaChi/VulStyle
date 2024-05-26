@@ -2,10 +2,10 @@ import os
 import json
 import string
 import pickle
-import pandas
 import sklearn
 import pathlib
 import collections
+import pandas as pd
 
 class VocabularyReduce:
 	def _pickle_data(self, data, file_name):
@@ -95,13 +95,19 @@ class VocabularyReduce:
 			out.append(" ".join(temp))
 		return out
 	
+	def devign_fintune(self, train_path, val_path, test_path):
+		devign_train = pd.read_json(train_path, lines = True)
+		devign_val = pd.read_json(val_path, lines = True)
+		devign_test = pd.read_json(test_path, lines = True)
+		return list(devign_train["func"]), list(devign_train["target"]), list(devign_val["func"]), list(devign_val["target"]), list(devign_test["func"]), list(devign_test["target"])
+	
 	def prep_finetune_data(self, x, y):
 		X_train, Xs, y_train, ys = sklearn.model_selection.train_test_split(x, y, train_size = 0.8, random_state = 1)
 		X_val, X_test, y_val, y_test = sklearn.model_selection.train_test_split(Xs, ys, test_size = 0.5, random_state = 1)
-		train_df = pandas.DataFrame({"text": X_train, "labels": y_train})
+		train_df = pd.DataFrame({"text": X_train, "labels": y_train})
 		train_df["text"] = train_df["text"].astype("string")
-		val_df = pandas.DataFrame({"text": X_val, "labels": y_val})
+		val_df = pd.DataFrame({"text": X_val, "labels": y_val})
 		val_df["text"] = val_df["text"].astype("string")
-		test_df = pandas.DataFrame({"text": X_test, "labels": y_test})
+		test_df = pd.DataFrame({"text": X_test, "labels": y_test})
 		test_df["text"] = test_df["text"].astype("string")
 		return train_df, val_df, test_df

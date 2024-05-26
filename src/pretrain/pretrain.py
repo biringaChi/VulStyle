@@ -19,9 +19,10 @@ train_file = "pretraining_data.txt"
 
 model_args = LanguageModelingArgs(output_dir = "models/cstyleBERT", 
                                   overwrite_output_dir = True,
+                                  max_seq_length = 512,
                                   vocab_size = 50000, 
-                                  train_batch_size = 32, 
-                                  num_train_epochs = 3
+                                  train_batch_size = 64, 
+                                  num_train_epochs = 7
                                   )
 start_time = time.time()
 try:
