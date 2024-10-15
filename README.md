@@ -1,11 +1,11 @@
-CStyleBERT: Multi-Modal Pre-Training for Code Stylometry-Augmented Vulnerability Detection
+VulStyle: A Multi-Modal Pre-Training for Code Stylometry-Augmented Vulnerability Detection
 
-Author: ```Chidera Biringa```
+<!-- Aritifact Author: ```Chidera Biringa``` --> 
 
 --- 
 
-<p align="center"> <img src="..doc/CStyleBERT.svg" width="95%"> </p>
+<p align="center"> <img src="..doc/vulstyle.svg" width="95%"> </p>
 
 ---
 
-```I will provide further details post-publication```
+```Further details post-publication```

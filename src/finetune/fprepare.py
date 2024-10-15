@@ -101,6 +101,25 @@ class VocabularyReduce:
 		devign_test = pd.read_json(test_path, lines = True)
 		return list(devign_train["func"]), list(devign_train["target"]), list(devign_val["func"]), list(devign_val["target"]), list(devign_test["func"]), list(devign_test["target"])
 	
+	def draper_fintune(self, train_path, val_path, test_path):
+		draper_train = self._unpickle_data(train_path)
+		draper_val = self._unpickle_data(val_path)
+		draper_test = self._unpickle_data(test_path)
+
+		draper_train_funcs = list(draper_train["functionSource"])
+		draper_val_funcs = list(draper_val["functionSource"])
+		draper_test_funcs = list(draper_test["functionSource"])
+
+		draper_train_labels = list(draper_train["combine"])
+		draper_val_labels = list(draper_val["combine"])
+		draper_test_labels = list(draper_test["combine"])
+
+		draper_train_labels = [0 if i is False else 1 for i in draper_train_labels]
+		draper_val_labels = [0 if i is False else 1 for i in draper_val_labels]
+		draper_test_labels = [0 if i is False else 1 for i in draper_test_labels]
+
+		return draper_train_funcs, draper_train_labels, draper_val_funcs, draper_val_labels, draper_test_funcs, draper_test_labels
+	
 	def prep_finetune_data(self, x, y):
 		X_train, Xs, y_train, ys = sklearn.model_selection.train_test_split(x, y, train_size = 0.8, random_state = 1)
 		X_val, X_test, y_val, y_test = sklearn.model_selection.train_test_split(Xs, ys, test_size = 0.5, random_state = 1)
